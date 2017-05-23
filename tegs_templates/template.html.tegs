@@ -1,3 +1,5 @@
 <div>
-    {{test}} {{test}}{{test}}
+    {% foreach tablica as damian %}
+        {{damian}}{{tablica.1}}
+    {% endfor %}
 </div>
