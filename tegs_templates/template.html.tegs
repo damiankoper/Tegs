@@ -1,5 +1,5 @@
-<div>
-    {% foreach tablica as damian %}
-        {{damian}}{{tablica.1}}
-    {% endfor %}
-</div>
+{%block damian%}
+    {%for 5%}
+    hehe
+    {%endfor%}
+{%endblock%}
