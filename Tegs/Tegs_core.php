@@ -10,6 +10,7 @@ class Tegs_core
     {
         $this->loader = $loader;
         return $this;
+        
     }
 
     /**

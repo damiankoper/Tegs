@@ -1,10 +1,11 @@
 <?php
-include_once "Tegs_core.php";
-include_once "Tegs_loader.php" ;
-include_once "Tegs_template.php" ;
 
-use \Tegs\core\Tegs_core;
-use \Tegs\loader\Tegs_loader;
+
+require_once "Tegs_autoloader.php";
+
+use \Tegs\core\Tegs_core as Tegs_core;
+use \Tegs\loader\Tegs_loader as Tegs_loader;
+
 
 try {
 
