@@ -1,14 +1,5 @@
-   <div>
-    {%include "template.html.tegs"%}
-    {% block damian %}
-        {% foreach tablica as damian %}
-            {% if tablica|length = 3 %}
-                {{damian|s}}
-            {%endif%}
-            {%else%}
-                {{damian}}{{damian}}
-            {%endelse%}
-        {% endforeach %}
-    {% endblock %}
-    
-    </div>
+<div>
+{%foreach tablica as damian%}
+    {{damian}}
+{%endforeach%}
+</div>
