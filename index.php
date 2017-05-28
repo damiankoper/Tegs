@@ -1,6 +1,6 @@
 <?php
 
-require_once "Tegs_autoloader.php";
+require_once "Tegs/Tegs_autoloader.php";
 use \Tegs\core\Tegs_core as Tegs_core;
 use \Tegs\loader\Tegs_loader as Tegs_loader;
 

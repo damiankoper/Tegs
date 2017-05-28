@@ -248,7 +248,7 @@ class Tegs_template
                             } else {
                                 $control_insert.= self::parse_content($control_content, $input);
                             }
-                        }
+                        } 
                         else{
                             $control_insert.= self::parse_content($control_content, $input);
                         }
