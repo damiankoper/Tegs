@@ -1,5 +1,4 @@
-<div>
-{%foreach tablica as damian%}
-    {{damian}}
-{%endforeach%}
-</div>
+{%extends "tegs_templates\template.html.tegs"%}
+{%block damian%}
+hehe
+{%endblock%}

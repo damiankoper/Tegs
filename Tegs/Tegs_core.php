@@ -1,5 +1,5 @@
 <?php 
-namespace Tegs\core;
+namespace Tegs;
 
 use Exception;
 

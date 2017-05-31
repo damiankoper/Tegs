@@ -1,5 +1,5 @@
 <?php 
-namespace Tegs\template;
+namespace Tegs;
 
 use Exception;
 use stdClass;

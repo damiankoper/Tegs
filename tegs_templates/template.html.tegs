@@ -1,5 +1,13 @@
-{%block damian%}
-    {%for 5%}
-    
-    {%endfor%}
-{%endblock%}
+{%spaceless%}
+    {% foreach empty_tab as damian%}
+        {%block damian%}
+        heheh
+        {%endblock%}
+        {%block damian2%}
+        {{"damcio"}}
+        {%endblock%} 
+    {%endforeach%}
+    {%else%}
+        tablica pusta
+    {%endelse%}
+{%endspaceless%}

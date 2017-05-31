@@ -1,6 +1,5 @@
 <?php 
-namespace Tegs\loader;
-use Tegs\template\Tegs_template;
+namespace Tegs;
  
 class Tegs_loader
 {
