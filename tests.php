@@ -20,6 +20,13 @@ Test::add(function() use ($template){
 },"Wyświetlanie stringa","Tegs");
 
 Test::add(function() use ($template){
+    $template->setContent('{{"{%%}{{}}"}}');
+    $process = $template->render(array());
+    return ($process==="{%%}{{}}")?true:false;
+},"Wyświetlanie tagów","Tegs");
+
+
+Test::add(function() use ($template){
     $template->setContent('{{1}}');
     $process = $template->render(array());
     return ($process==="1")?true:false;
