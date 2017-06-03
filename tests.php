@@ -164,9 +164,12 @@ Test::add(function() use ($template){
     $process = $template->render(array("foo"=>"bar","bar"=>"baz"));
     return ($process==="fooo fooo fooo bar baz")?true:false;
 },"Template from file - extends duplicates","Tegs");
+
 Test::add(function() use ($template){
     $template->setContent('{%set foo as 5%}{{foo + 5}}');
     $process = $template->render(array());
     return ($process==="10")?true:false;
 },"Set variable simple","Tegs");
+
+
 Test::run();
