@@ -1,0 +1,13 @@
+{%extends "test_6.html.tegs"%}
+{%block foo%}
+    foo
+{%endblock%}
+{%block bar%}
+    bar
+{%endblock%}
+{%block baz%}
+    baz
+{%endblock%}
+{%block foo%}
+    fooo
+{%endblock%}

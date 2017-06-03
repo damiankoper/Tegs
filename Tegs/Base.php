@@ -24,6 +24,7 @@ class Base
             return $this->$property;
         }
         \preg_match("/^set([\S]+)$/",$name, $setMatches);
+        if(\array_key_exists("1",$setMatches))
         $property = "_".\lcfirst($setMatches[1]);
         
         if(\property_exists($this,$property)){

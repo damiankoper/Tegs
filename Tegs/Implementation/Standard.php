@@ -77,10 +77,20 @@ class Standard extends \Tegs\Implementation
                 "nextIfFailure"=>array("else"),
                 "ignoreAlone"=>false
             ),
+            "set"=>array(
+                "end"=>"",
+                "handler"=>"_set",
+                "standalone"=>true,
+                "nextIfFailure"=>array("else"),
+                "ignoreAlone"=>false
+            ),
             "d_handler"=>"_getExceptionForImplementation"
         )
     );
     protected $_functions = array(
+        ""=>array(
+            "handler"=>"_expression"
+        ),
         "lorem"=>array(
             "handler"=>"_lorem"
         )
@@ -129,7 +139,7 @@ class Standard extends \Tegs\Implementation
     }
     protected function _echo($arguments, $content, $scope)
     {
-        return $this->parseValue($arguments[0], $scope);
+        return self::_expression($arguments, $scope);
     }
     protected function _spaceless($arguments, $content, $scope)
     {
@@ -139,42 +149,7 @@ class Standard extends \Tegs\Implementation
     }
     protected function _if($arguments, $content, $scope)
     {
-        $bool = true;
-        $vLeft = null;
-        $vRight = null;
-        $operator = null;
-        foreach ($arguments as $argument) {
-            switch ($argument) {
-                case "&&":
-                    $bool = $bool && self::_bool($operator, $vLeft, $vRight);
-                    $vLeft = null;
-                    $vRight = null;
-                    $operator = null;
-                break;
-                case "||":
-                    $bool = $bool || self::_bool($operator, $vLeft, $vRight);
-                    $vLeft = null;
-                    $vRight = null;
-                    $operator = null;
-                break;
-                case "<":
-                case ">":
-                case "==":
-                case "<=":
-                case ">=":
-                    $operator = $argument;
-                break;
-                default:
-                    if ($vLeft===null) {
-                        $vLeft = $this->parseValue($argument, $scope);
-                    } elseif ($vRight === null) {
-                        $vRight = $this->parseValue($argument, $scope);
-                    } else {
-                        throw $this->_getExceptionForSyntax($argument);
-                    }
-            }
-        }
-        $bool = $bool && self::_bool($operator, $vLeft, $vRight);
+        $bool = self::_expression($arguments,$scope);
         return ($bool) ? self::handle($scope, $content):false;
     }
     protected function _pass($arguments, $content, $scope)
@@ -183,10 +158,58 @@ class Standard extends \Tegs\Implementation
     }
     protected function _lorem($args, $scope)
     {
-        if ($args[0] > \strlen($this->getLorem())) {
+        if (!\is_numeric($args[0]) || $args[0] > \strlen($this->getLorem())) {
             throw $this->_getExceptionForValue($args[0], "MAX: ".\strlen($this->getLorem()));
         }
         return \substr($this->getLorem(), 0, $args[0]);
+    }
+    protected function _expression($args, $scope)
+    {
+        $bool = null;
+        $bool_waiting = null;
+        $vLeft = null;
+        $vRight = null;
+        $operator = null;
+        foreach ($args as $argument) {
+            switch ($argument) {
+                case "&&":
+                    $bool = ($bool===null)?$vLeft:$bool && $vLeft;
+                    $bool_waiting = $argument;
+                    $vLeft = $vRight = $operator = null;
+                break;
+                case "||":
+                    $bool = ($bool===null)?$vLeft:$bool || $vLeft;
+                    $bool_waiting = $argument;
+                    $vLeft = $vRight = $operator = null;
+                break;
+                case "<": case ">": case "==": case "!=": case "<=": case ">=":
+                case "+": case"-":case"*":case"/":case"**":
+                    $operator = $argument;
+                break;
+                default:
+                    if ($vLeft===null) {
+                        $vLeft = $this->parseValue($argument, $scope);
+                    } else {
+                        $vRight = $this->parseValue($argument, $scope);
+                        if($bool_waiting==="&&"){
+                            $vLeft = $bool && self::_operator($operator, $vLeft, $vRight);
+                            $bool_waiting=null;
+                        }
+                        elseif($bool_waiting==="||"){
+                            $vLeft = $bool || self::_operator($operator, $vLeft, $vRight);
+                            $bool_waiting=null;
+                        }
+                        else{
+                        $vLeft = self::_operator($operator, $vLeft, $vRight);
+                        }
+                    }/* elseif (!$vLeft===null && $operator!==null && $vRight!==null) {
+                        
+                    } else {
+                        throw $this->_getExceptionForSyntax($argument);
+                    }*/
+            }
+        }
+        return $vLeft;
     }
     protected function _length($var)
     {
@@ -198,7 +221,7 @@ class Standard extends \Tegs\Implementation
     }
     protected function _include($arguments, $content, $scope, &$tree)
     {
-        $template = new \Tegs\Template(array("_template"=>$this->parseValue($arguments[0], $scope)));
+        $template = new \Tegs\Template(array("_template"=>$scope["_templateDir"]."/".\trim($this->parseValue($arguments[0], $scope), "\\/")));
         $key = \key($tree);
         \array_splice($tree, \key($tree), 0, $template->getTree());
         while ($key!==\key($tree)) {
@@ -207,7 +230,7 @@ class Standard extends \Tegs\Implementation
     }
     protected function _extends($arguments, $content, $scope, &$tree)
     {
-        $template = new \Tegs\Template(array("_template"=>$this->parseValue($arguments[0], $scope)));
+        $template = new \Tegs\Template(array("_template"=>$scope["_templateDir"]."/".\trim($this->parseValue($arguments[0], $scope), "\\/")));
         $parent_tree = $template->getTree();
         $blocks_parent = &self::_searchBlock($parent_tree);
         $blocks_child = self::_searchBlock($tree);
@@ -219,6 +242,12 @@ class Standard extends \Tegs\Implementation
             }
         }
         $tree = $parent_tree;
+    }
+    protected function _set($arguments, $content, &$scope){
+        if ($arguments[1]!=="as") {
+            throw $this->_getExceptionForSyntax(\implode($arguments));
+        }
+        $scope[$arguments[0]]=self::_expression(\array_slice($arguments,2),$scope);
     }
 
     private function &_searchBlock(&$tree, $replace=false, $blocks=null)
@@ -236,7 +265,7 @@ class Standard extends \Tegs\Implementation
         }
         return $result;
     }
-
+    
 
     protected $_lorem = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis a volutpat quam. Cras et consequat turpis. Curabitur ultrices efficitur faucibus. Pellentesque sollicitudin dignissim dui ut hendrerit. Donec eu ante quis tellus mollis euismod. Cras tristique dui in blandit tempus. Morbi magna purus, tempus sit amet dolor id, mollis faucibus dolor. Mauris nunc dui, dictum quis tempor vel, imperdiet in quam. Interdum et malesuada fames ac ante ipsum primis in faucibus. Curabitur varius dapibus malesuada. Proin eget erat id nisi ornare molestie. Pellentesque a faucibus tortor. Phasellus nec nisi sit amet sapien finibus rhoncus. Etiam scelerisque porttitor sem quis elementum.";
 }

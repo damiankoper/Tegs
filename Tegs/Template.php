@@ -8,7 +8,7 @@ class Template extends Base
     protected $_array;
     protected $_tree;
     protected $_parsed;
-
+    protected $_content;
     public function __construct($options)
     {
         parent::__construct($options);
@@ -20,7 +20,14 @@ class Template extends Base
 
     protected function _array()
     {
-        $content = \file_get_contents($this->_template);
+        if($this->getContent()==null){
+            if(\file_exists($this->_template)){
+            $this->setContent(\file_get_contents($this->_template));}
+            else {
+                throw $this->_getExceptionForSyntax("template {$this->_template} not found");
+            }
+        }
+        $content = $this->getContent();
         $syntax = $this->_implementation->getSyntax();
 
         $array = array();
@@ -67,6 +74,7 @@ class Template extends Base
                     } else {
                         $open = $key;
                         $open_c = 1;
+                        $close = null;
                         foreach ($array as $key_search => $item_search) {
                             if ($key_search<=$key) {
                                 continue;
@@ -82,6 +90,7 @@ class Template extends Base
                                 break;
                             }
                         }
+                        if($close===null) throw self::_getExceptionForSyntax($item->getMeta()["keyword"]." closing tag not found");
                         $array_node = \array_slice($array, $open+1, $close-$open);
                         $item->setContent($this->_tree($array_node));
                         $tree[]=$item;
@@ -110,8 +119,15 @@ class Template extends Base
     }
     public function render($scope)
     {
+        $scope["_templateDir"] = \dirname($this->getTemplate());
         self::_array();
         $tree = self::_tree();
         return $this->getImplementation()->handle($scope, $tree);
     }
+
+    protected function _getExceptionForSyntax($syntax)
+    {
+        return new \Exception("Syntax error {$syntax}");
+    }
+
 }

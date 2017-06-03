@@ -1,5 +1,6 @@
 <?php
 namespace Tegs;
+use Tegs\ArrayMethods\ArrayMethods as ArrayMethods;
 
 class Tag extends Base
 {
@@ -42,11 +43,11 @@ class Tag extends Base
         $string = \ltrim($string,$syntax[$type]["open"]." ");
         $string = \rtrim($string,$syntax[$type]["close"]." ");
         //$array = \array_filter(\explode(" ", $string));
-        preg_match_all('/"(?:\\\\.|[^\\\\"])*"\S+|\S+\((?:\\\\.|[^\\\\)])*\)|\S+/', $string,$array);
+        preg_match_all('/"(?:\\\\.|[^\\\\"])*"\S+|"(?:\\\\.|[^\\\\"])*"|[^\( ]*(\((?>[^()]+|(?1))*\))|\S+/', $string,$array);
         $keyword = \array_shift($array[0]);
         return array(
             "keyword" => $keyword,
-            "arguments" => ($type==="variable")?array($keyword):$array[0]
+            "arguments" => ($type==="variable")?ArrayMethods::unshiftReturn($array[0],$keyword):$array[0]
             );
     }
 }

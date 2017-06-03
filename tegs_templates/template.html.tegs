@@ -4,7 +4,7 @@
         heheh
         {%endblock%}
         {%block damian2%}
-        {{"damcio"}}
+        {{damcio}}
         {%endblock%} 
     {%endforeach%}
     {%else%}

@@ -88,19 +88,20 @@ class Implementation extends Base
     {
         $return_scope = $scope;
         //$array_tree = \explode($this->getDelimiters()["array"],$name);
-        preg_match_all('/"(?:\\\\.|[^\\\\"])*"|(?:[^'.$this->getDelimiters()["array"].']+)\((?:\\\\.|[^\\\\)])*\)|[^'.$this->getDelimiters()["array"].'\s]+/', $name, $array_tree);
+        preg_match_all('/\([\s\S]+\)|"(?:\\\\.|[^\\\\"])*"\S+|"(?:\\\\.|[^\\\\"])*"|(?:[^'.$this->getDelimiters()["array"].']+)\((?:\\\\.|[^\\\\)])*\)|[^'.$this->getDelimiters()["array"].'\s]+/', $name, $array_tree);
         
         foreach ($array_tree[0] as $step) {
-            \preg_match('/(?:"[\S\s]+")|[^'.$this->getDelimiters()["filter"].']+/',$step,$step);
+            \preg_match('/(\S*)\(([\s\S]*)?\)|(?:"[\S\s]+")|[^'.$this->getDelimiters()["filter"].']+/',$step,$step);
             $step = $step[0];
             \preg_match("/\"[\s\S]+\"/", $step, $matchString);
-            \preg_match("/(\S*)\(([\s\S]*)?\)/", $step, $matchFunction);
+            \preg_match("/([^\(]*)\(([\s\S]*)?\)$/", $step, $matchFunction);
+            \preg_match("/^[0-9]+$/", $step, $matchNumber);
             if (\is_array($return_scope)&&\array_key_exists($step, $return_scope)) {
                 $return_scope = $return_scope[$step];
                 if ($return_scope == null || empty($return_scope)) {
                     return false;
                 }
-            } elseif (!empty($matchString[0])&& empty($matchFilter[0])) {
+            } elseif ((!empty($matchString[0])&& empty($matchFilter[0]))||!empty($matchNumber[0])) {
                 $return_scope = \trim($step, "\"");
                 break;
             } elseif (!empty($matchFunction[0])) {
@@ -110,9 +111,9 @@ class Implementation extends Base
                 throw $this->_getExceptionForSyntax("$step not found");
             }
         }
-        \preg_match('/^("(?:\\\\.|[^\\\\"])+")*(\\'.$this->getDelimiters()["filter"].'[^\s ]*)$/', $name, $filter_tree);
-        if (!empty($filter_tree[2])) {
-            foreach (\array_filter(\explode($this->getDelimiters()["filter"], $filter_tree[2])) as $filter) {
+        \preg_match_all('/"(?:\\\\.|[^\\\\])*"|[^\|]+|(?:\\'.$this->getDelimiters()["filter"].'[\S]*)/', $name, $filter_tree);
+        if (\array_key_exists("1",$filter_tree[0])) {
+            foreach (\array_filter(\explode($this->getDelimiters()["filter"],$filter_tree[0][1])) as $filter) {
                 $return_scope = self::parseFilter($filter, $return_scope);
             }
         }
@@ -120,7 +121,7 @@ class Implementation extends Base
     }
     private function parseFunction($name, $args, $scope)
     {
-        \preg_match_all("/[^\s,]+/", $args, $args_array);
+        \preg_match_all("/\([^\(]+\)|[^\s,]+/", $args, $args_array);
         $functions = $this->getFunctions();
         $response="";
         if (\array_key_exists($name, $functions)) {
@@ -143,7 +144,12 @@ class Implementation extends Base
         else throw $this->_getExceptionForSyntax("undefined filter {$name}");
         return $response;
     }
-    protected function _bool($operator, $vLeft, $vRight)
+    private function parseExpression($name, $scope)
+    {
+      $name;
+        return $response;
+    }
+    protected function _operator($operator, $vLeft, $vRight)
     {
         if ($operator ===null || $vLeft===null|| $vRight===null) {
             throw $this->_getExceptionForSyntax("BOOL NULL");
@@ -155,10 +161,24 @@ class Implementation extends Base
                 return $vLeft > $vRight;
                 case "==":
                 return $vLeft == $vRight;
+                case "!=":
+                return $vLeft != $vRight;
                 case "<=":
                 return $vLeft <= $vRight;
                 case ">=":
                 return $vLeft >= $vRight;
+                case "+":
+                return $vLeft + $vRight;
+                case "-":
+                return $vLeft - $vRight;
+                case "*":
+                return $vLeft * $vRight;
+                case "/":
+                return $vLeft / $vRight;
+                case "%":
+                return $vLeft % $vRight;
+                case "**":
+                return pow(intval($vLeft), ($vRight));
                 default:
                 throw $this->_getExceptionForSyntax("invalid operator {$operator}");
         }

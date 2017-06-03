@@ -1,0 +1,11 @@
+{%spaceless%}
+    {%block foo%}
+        bar
+    {%endblock%}
+    {%block bar%}
+        foo
+    {%endblock%}
+    {%block baz%}
+        baz
+    {%endblock%}
+{%endspaceless%}

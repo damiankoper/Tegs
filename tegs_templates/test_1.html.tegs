@@ -1,0 +1,1 @@
+{{foo}}{%include "test_2.html.tegs"%}

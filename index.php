@@ -1,20 +1,11 @@
 <?php
 
 require_once "Tegs_autoloader.php";
-use \Tegs\Tegs_core as Tegs_core;
-use \Tegs\Tegs_loader as Tegs_loader;
-
-
+use Tegs\Template as Template;
 try {
-
-    $loader = new Tegs_loader("tegs_templates/");
-    $Tegs = new Tegs_core($loader);
-    $template = $Tegs->load("base.html.tegs");
-    $template->display(array("test"=>"damcio", "tablica"=>array("heh<p></p>", "hih", "huh")));
-    //$template->display_block("damian",array("test"=>"damcio", "tablica"=>array("heh<b>hehehe</b>", "hih", "huh")));
-
+    $template = new Template(array("_template"=>"tegs_templates/base.html.tegs"));
+    echo $template->render(array("test"=>"damcio","empty_tab"=>array("xd"), "tablica"=>array("heh", "hih", "huh")));
 } catch (Exception $e) {
-    echo "<b>Error ".end($e->getTrace())["file"]."(".end($e->getTrace())["line"]."): </b>". $e->getMessage();
+    echo "<b>Error ".$e->getFile()."(".$e->getLine()."): </b>". $e->getMessage();
 }
 ?>
-<html
