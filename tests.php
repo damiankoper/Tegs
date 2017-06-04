@@ -178,5 +178,4 @@ Test::add(function() use ($template){
     return ($process==="10")?true:false;
 },"Set variable simple","Tegs");
 
-
 Test::run();

@@ -1,13 +1,3 @@
 {%spaceless%}
-    {% foreach empty_tab as damian%}
-        {%block damian%}
-        heheh
-        {%endblock%}
-        {%block damian2%}
-        {{damcio}}
-        {%endblock%} 
-    {%endforeach%}
-    {%else%}
-        tablica pusta
-    {%endelse%}
+{{lorem(100)}}
 {%endspaceless%}
