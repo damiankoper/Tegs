@@ -173,9 +173,19 @@ Test::add(function() use ($template){
 },"Template from file - extends duplicates","Tegs");
 
 Test::add(function() use ($template){
-    $template->setContent('{%set foo as 5%}{{foo + 5}}');
+    $template->setContent('{%set foo as 5%}{%set foo as (foo + 5)%}{{foo + 5}}');
     $process = $template->render(array());
-    return ($process==="10")?true:false;
+    return ($process==="15")?true:false;
 },"Set variable simple","Tegs");
 
+Test::add(function() use ($template){
+    $template->setContent('{%setblock foo as 5%}5{%endsetblock%}{{foo}}');
+    $process = $template->render(array());
+    return ($process==="5")?true:false;
+},"Setblock simple","Tegs");
+Test::add(function() use ($template){
+    $template->setContent('{%setblock foo%}{{bar + 5}}{%endsetblock%}{{foo}}');
+    $process = $template->render(array("bar"=>5));
+    return ($process==="10")?true:false;
+},"Setblock parse variable simple","Tegs");
 Test::run();

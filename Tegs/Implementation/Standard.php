@@ -84,6 +84,13 @@ class Standard extends \Tegs\Implementation
                 "nextIfFailure"=>array("else"),
                 "ignoreAlone"=>false
             ),
+            "setblock"=>array(
+                "end"=>"endsetblock",
+                "handler"=>"_setblock",
+                "standalone"=>false,
+                "nextIfFailure"=>array("else"),
+                "ignoreAlone"=>false
+            ),
             "d_handler"=>"_getExceptionForImplementation"
         )
     );
@@ -248,6 +255,9 @@ class Standard extends \Tegs\Implementation
             throw $this->_getExceptionForSyntax(\implode($arguments));
         }
         $scope[$arguments[0]]=self::_expression(\array_slice($arguments,2),$scope);
+    }
+    protected function _setblock($arguments, $content, &$scope){
+        $scope[$arguments[0]]=self::handle($scope, $content);
     }
 
     private function &_searchBlock(&$tree, $replace=false, $blocks=null)
