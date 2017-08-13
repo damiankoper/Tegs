@@ -25,6 +25,11 @@ Test::add(function() use ($template){
     return ($process==="{%%}{{}}")?true:false;
 },"Wyświetlanie tagów","Tegs");
 
+Test::add(function() use ($template){
+    $template->setContent('"{{"{%%}{{}}"}}"');
+    $process = $template->render(array());
+    return ($process==="\"{%%}{{}}\"")?true:false;
+},"Wyświetlanie tagów w ciapkach","Tegs");
 
 Test::add(function() use ($template){
     $template->setContent('{{1}}');

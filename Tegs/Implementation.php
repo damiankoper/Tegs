@@ -59,7 +59,7 @@ class Implementation extends Base
         $meta_key = null;
         foreach ($syntax as $key => $type) {
             $search = \strpos($content, $type["open"]);
-            if ($search < $position || $position===false) {
+            if (($search!==false&&$search < $position )|| $position===false) {
                 $position = $search;
                 $meta_key = $key;
             }

@@ -12,10 +12,10 @@ class Tag extends Base
 
     public function getSingleTagFromString($content, $position, $syntax)
     {
-        \preg_match('/(?!\B"[^"]*)'.$syntax["close"].'(?![^"]*"\B)/',$content,$closing,PREG_OFFSET_CAPTURE);
+        \preg_match('/(?:[^"]|["][^"]*")*?('.$syntax["close"].')/',$content,$closing,PREG_OFFSET_CAPTURE,$position);
         $this->setPos(array(
             "start"=>$position,
-            "end"=>$closing[0][1] + \strlen($syntax["close"])
+            "end"=>$closing[1][1] + \strlen($syntax["close"])
             ));
         return $this;
     }
